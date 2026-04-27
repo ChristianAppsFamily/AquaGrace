@@ -1,39 +1,45 @@
-const waterBlue = "#2196F3";
-const waterBlueLight = "#E3F2FD";
-const waterBlueMedium = "#90CAF9";
+const neonSkyBlue = "#00BFFF";
+const neonSkyBlueLight = "#CFF3FF";
+const neonSkyBlueMedium = "#7FE0FF";
+
+const cream = "#F7EFD8";
+const creamSurface = "#FBF6E4";
+const creamSecondary = "#F1E7C9";
+const creamBorder = "#E6D9B4";
+const creamBorderLight = "#EFE4C2";
 
 export default {
   light: {
     text: "#1A1A1A",
-    textSecondary: "#8E8E93",
-    textTertiary: "#AEAEB2",
-    background: "#F8F9FA",
-    surface: "#FFFFFF",
-    surfaceSecondary: "#F2F2F7",
-    border: "#E5E5EA",
-    borderLight: "#F0F0F0",
-    tint: waterBlue,
-    tintLight: waterBlueLight,
-    tintMedium: waterBlueMedium,
-    tabIconDefault: "#C7C7CC",
-    tabIconSelected: waterBlue,
+    textSecondary: "#7A7460",
+    textTertiary: "#A89F82",
+    background: cream,
+    surface: creamSurface,
+    surfaceSecondary: creamSecondary,
+    border: creamBorder,
+    borderLight: creamBorderLight,
+    tint: neonSkyBlue,
+    tintLight: neonSkyBlueLight,
+    tintMedium: neonSkyBlueMedium,
+    tabIconDefault: "#B8AE8E",
+    tabIconSelected: neonSkyBlue,
     danger: "#FF3B30",
     success: "#34C759",
   },
   dark: {
-    text: "#F5F5F5",
-    textSecondary: "#8E8E93",
-    textTertiary: "#636366",
-    background: "#000000",
-    surface: "#1C1C1E",
-    surfaceSecondary: "#2C2C2E",
-    border: "#38383A",
-    borderLight: "#2C2C2E",
-    tint: waterBlue,
-    tintLight: "#0D47A1",
-    tintMedium: "#1565C0",
-    tabIconDefault: "#636366",
-    tabIconSelected: waterBlue,
+    text: "#F7EFD8",
+    textSecondary: "#A8A28A",
+    textTertiary: "#6E6852",
+    background: "#0A0E12",
+    surface: "#14191F",
+    surfaceSecondary: "#1C232B",
+    border: "#2A323C",
+    borderLight: "#1F262E",
+    tint: neonSkyBlue,
+    tintLight: "#003B5C",
+    tintMedium: "#0077B6",
+    tabIconDefault: "#5C6470",
+    tabIconSelected: neonSkyBlue,
     danger: "#FF453A",
     success: "#30D158",
   },

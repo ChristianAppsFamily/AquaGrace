@@ -22,7 +22,7 @@ export default function RippleButton({
   sublabel,
   onPress,
   style,
-  color = "#2196F3",
+  color = "#00BFFF",
   textColor = "#FFFFFF",
 }: RippleButtonProps) {
   const scaleAnim = useRef(new Animated.Value(1)).current;

@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: "#2196F3",
+    backgroundColor: "#00BFFF",
     opacity: 0.6,
   },
   blackHint: {
