@@ -1,6 +1,6 @@
 import { router } from "expo-router";
-import { Droplets, Flame, Music } from "lucide-react-native";
-import React, { useCallback, useRef, useState } from "react";
+import { BookOpen, Droplets, Flame, Music } from "lucide-react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Modal,
@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CircularProgress from "@/components/CircularProgress";
 import RippleButton from "@/components/RippleButton";
 import Colors from "@/constants/colors";
+import { getDailyVerse } from "@/constants/verses";
 import { useTodayProgress, useWater } from "@/providers/WaterProvider";
 
 export default function HomeScreen() {
@@ -26,6 +27,7 @@ export default function HomeScreen() {
   const [customModalVisible, setCustomModalVisible] = useState<boolean>(false);
   const [customAmount, setCustomAmount] = useState<string>("");
   const isDark = settings.darkMode;
+  const dailyVerse = useMemo(() => getDailyVerse(), []);
   const colors = isDark ? Colors.dark : Colors.light;
 
   const splashAnim = useRef(new Animated.Value(0)).current;
@@ -81,7 +83,7 @@ export default function HomeScreen() {
               {getGreeting()}
             </Text>
             <Text style={[styles.title, { color: colors.text }]}>
-              AquaFlow
+              AquaGrace
             </Text>
           </View>
           <Pressable
@@ -166,6 +168,19 @@ export default function HomeScreen() {
             textColor={colors.text}
             style={{ borderWidth: 1, borderColor: colors.border }}
           />
+        </View>
+
+        <View style={[styles.verseCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={styles.verseHeader}>
+            <BookOpen size={14} color={colors.tint} />
+            <Text style={[styles.verseHeaderText, { color: colors.tint }]}>Daily Verse</Text>
+          </View>
+          <Text style={[styles.verseText, { color: colors.text }]}>
+            &ldquo;{dailyVerse.text}&rdquo;
+          </Text>
+          <Text style={[styles.verseRef, { color: colors.textSecondary }]}>
+            — {dailyVerse.reference}
+          </Text>
         </View>
 
         <View style={[styles.todaySummary, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -362,6 +377,36 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 12,
     marginBottom: 28,
+  },
+  verseCard: {
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  verseHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 12,
+  },
+  verseHeaderText: {
+    fontSize: 12,
+    fontWeight: "700" as const,
+    letterSpacing: 0.8,
+    textTransform: "uppercase" as const,
+  },
+  verseText: {
+    fontSize: 15,
+    fontWeight: "400" as const,
+    lineHeight: 24,
+    fontStyle: "italic" as const,
+    marginBottom: 10,
+  },
+  verseRef: {
+    fontSize: 13,
+    fontWeight: "600" as const,
+    textAlign: "right" as const,
   },
   todaySummary: {
     borderRadius: 20,

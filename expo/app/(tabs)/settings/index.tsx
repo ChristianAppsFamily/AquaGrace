@@ -253,7 +253,7 @@ export default function SettingsScreen() {
         </View>
 
         <Text style={[styles.footerText, { color: colors.textTertiary }]}>
-          AquaFlow v1.0 · Stay hydrated
+          AquaGrace v1.0 · Stay hydrated
         </Text>
       </ScrollView>
 
