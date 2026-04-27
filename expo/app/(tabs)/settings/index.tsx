@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Colors from "@/constants/colors";
 import { useWater } from "@/providers/WaterProvider";
-import { UnitType, formatAmount, unitLabel } from "@/types/water";
+import { UnitType, formatAmount, unitLabel, to12Hour, from12Hour } from "@/types/water";
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -51,16 +51,16 @@ export default function SettingsScreen() {
   const handleOpenTime = useCallback(
     (type: "wake" | "sleep") => {
       setEditingTime(type);
-      setTimeInput(type === "wake" ? settings.wakeTime : settings.sleepTime);
+      const current = type === "wake" ? settings.wakeTime : settings.sleepTime;
+      setTimeInput(to12Hour(current));
       setTimeModalVisible(true);
     },
     [settings.wakeTime, settings.sleepTime]
   );
 
   const handleSaveTime = useCallback(() => {
-    const match = timeInput.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
-    if (match) {
-      const formatted = `${match[1].padStart(2, "0")}:${match[2]}`;
+    const formatted = from12Hour(timeInput);
+    if (formatted) {
       if (editingTime === "wake") {
         updateSettings({ wakeTime: formatted });
       } else {
@@ -68,7 +68,7 @@ export default function SettingsScreen() {
       }
       setTimeModalVisible(false);
     } else {
-      Alert.alert("Invalid", "Please enter time in HH:MM format (e.g., 07:00).");
+      Alert.alert("Invalid", "Please enter time in 12-hour format (e.g., 7:00 AM).");
     }
   }, [timeInput, editingTime, updateSettings]);
 
@@ -167,7 +167,7 @@ export default function SettingsScreen() {
                   Wake Time
                 </Text>
                 <Text style={[styles.rowValue, { color: colors.textSecondary }]}>
-                  {settings.wakeTime}
+                  {to12Hour(settings.wakeTime)}
                 </Text>
               </View>
             </View>
@@ -184,7 +184,7 @@ export default function SettingsScreen() {
                   Sleep Time
                 </Text>
                 <Text style={[styles.rowValue, { color: colors.textSecondary }]}>
-                  {settings.sleepTime}
+                  {to12Hour(settings.sleepTime)}
                 </Text>
               </View>
             </View>
@@ -222,7 +222,7 @@ export default function SettingsScreen() {
               >
                 <Clock size={12} color={colors.textSecondary} />
                 <Text style={[styles.chipText, { color: colors.text }]}>
-                  {time}
+                  {to12Hour(time)}
                 </Text>
               </View>
             ))}
@@ -321,7 +321,7 @@ export default function SettingsScreen() {
             <View style={[styles.inputRow, { borderColor: colors.border }]}>
               <TextInput
                 style={[styles.input, { color: colors.text }]}
-                placeholder="07:00"
+                placeholder="7:00 AM"
                 placeholderTextColor={colors.textTertiary}
                 keyboardType="default"
                 value={timeInput}
@@ -331,7 +331,7 @@ export default function SettingsScreen() {
               />
             </View>
             <Text style={[styles.inputHint, { color: colors.textTertiary }]}>
-              Use 24h format (e.g., 07:00 or 23:00)
+              Use 12h format (e.g., 7:00 AM or 11:00 PM)
             </Text>
             <View style={styles.modalButtons}>
               <Pressable

@@ -66,3 +66,29 @@ export function getTodayKey(): string {
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
+
+export function to12Hour(time24: string): string {
+  const match = time24.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return time24;
+  const h = parseInt(match[1], 10);
+  const m = match[2];
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${m} ${period}`;
+}
+
+export function from12Hour(time12: string): string | null {
+  const trimmed = time12.trim().toUpperCase();
+  const match = trimmed.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/);
+  if (!match) return null;
+  let h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  const period = match[3];
+  if (h < 1 || h > 12 || m < 0 || m > 59) return null;
+  if (period === "AM") {
+    h = h === 12 ? 0 : h;
+  } else {
+    h = h === 12 ? 12 : h + 12;
+  }
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}

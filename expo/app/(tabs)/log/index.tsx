@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Colors from "@/constants/colors";
 import { useWater } from "@/providers/WaterProvider";
+import { to12Hour } from "@/types/water";
 
 interface TimelineEntryProps {
   entry: { id: string; time: string; amount: number };
@@ -95,7 +96,7 @@ function TimelineEntry({
             ]}
           />
           <Text style={[styles.entryTime, { color: colors.textSecondary }]}>
-            {entry.time}
+            {to12Hour(entry.time)}
           </Text>
         </View>
         <View style={styles.entryRight}>
