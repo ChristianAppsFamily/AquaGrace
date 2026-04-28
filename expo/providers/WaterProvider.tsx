@@ -124,6 +124,42 @@ export const [WaterProvider, useWater] = createContextHook(() => {
     [records, todayKey, settings.goalMl, saveRecords]
   );
 
+  const subtractWater = useCallback(
+    (amount: number) => {
+      const current = records[todayKey];
+      if (!current || current.entries.length === 0 || amount <= 0) return;
+
+      let remaining = amount;
+      const reversed = [...current.entries].reverse();
+      const keptReversed: WaterEntry[] = [];
+      for (const entry of reversed) {
+        if (remaining <= 0) {
+          keptReversed.push(entry);
+          continue;
+        }
+        if (entry.amount <= remaining) {
+          remaining -= entry.amount;
+        } else {
+          keptReversed.push({ ...entry, amount: entry.amount - remaining });
+          remaining = 0;
+        }
+      }
+      const newEntries = keptReversed.reverse();
+      const newTotal = newEntries.reduce((sum, e) => sum + e.amount, 0);
+      const updatedRecord: DailyRecord = {
+        ...current,
+        totalMl: newTotal,
+        entries: newEntries,
+        goalMet: newTotal >= settings.goalMl,
+      };
+      const updatedRecords = { ...records, [todayKey]: updatedRecord };
+      setRecords(updatedRecords);
+      saveRecords(updatedRecords);
+      console.log(`[AquaGrace] Subtracted ${amount - remaining}ml. Total: ${newTotal}ml`);
+    },
+    [records, todayKey, settings.goalMl, saveRecords]
+  );
+
   const removeEntry = useCallback(
     (entryId: string) => {
       const current = records[todayKey];
@@ -203,6 +239,7 @@ export const [WaterProvider, useWater] = createContextHook(() => {
     updateSettings,
     todayRecord,
     addWater,
+    subtractWater,
     removeEntry,
     getRecord,
     getLast7Days,

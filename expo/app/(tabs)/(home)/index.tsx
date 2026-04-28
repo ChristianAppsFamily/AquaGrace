@@ -1,6 +1,7 @@
 import { useAudioPlayer } from "expo-audio";
 import { router } from "expo-router";
-import { BookOpen, Droplets, Flame, Music } from "lucide-react-native";
+import * as Haptics from "expo-haptics";
+import { BookOpen, Droplets, Flame, Minus, Music } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Animated,
@@ -28,7 +29,7 @@ const webInputReset = Platform.OS === "web"
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { addWater, todayRecord, settings, streak, formatAmount: fmt, unitLabel: getUnit } = useWater();
+  const { addWater, subtractWater, todayRecord, settings, streak, formatAmount: fmt, unitLabel: getUnit } = useWater();
   const { progress, remaining, total, goal } = useTodayProgress();
   const unit = getUnit();
   const [customModalVisible, setCustomModalVisible] = useState<boolean>(false);
@@ -74,6 +75,14 @@ export default function HomeScreen() {
       ]).start();
     },
     [addWater, splashAnim, playDrinkSound]
+  );
+
+  const handleSubtract = useCallback(
+    (amount: number) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      subtractWater(amount);
+    },
+    [subtractWater]
   );
 
   const handleCustomSubmit = useCallback(() => {
@@ -174,25 +183,46 @@ export default function HomeScreen() {
         )}
 
         <View style={styles.buttonsRow}>
-          <RippleButton
-            label={settings.unit === 'oz' ? '+8' : '+250'}
-            sublabel={unit}
-            onPress={() => handleAdd(settings.unit === 'oz' ? 237 : 250)}
-            color={colors.tint}
-          />
-          <RippleButton
-            label={settings.unit === 'oz' ? '+16' : '+500'}
-            sublabel={unit}
-            onPress={() => handleAdd(settings.unit === 'oz' ? 473 : 500)}
-            color={colors.tint}
-          />
-          <RippleButton
-            label="Custom"
-            onPress={() => setCustomModalVisible(true)}
-            color={isDark ? colors.surfaceSecondary : colors.surfaceSecondary}
-            textColor={colors.text}
-            style={{ borderWidth: 1, borderColor: colors.border }}
-          />
+          <View style={styles.addPair}>
+            <RippleButton
+              label={settings.unit === 'oz' ? '+8' : '+250'}
+              sublabel={unit}
+              onPress={() => handleAdd(settings.unit === 'oz' ? 237 : 250)}
+              color={colors.tint}
+            />
+            <Pressable
+              onPress={() => handleSubtract(settings.unit === 'oz' ? 237 : 250)}
+              style={[styles.minusBtn, { backgroundColor: colors.surfaceSecondary, borderColor: colors.border }]}
+              testID="minus-btn-small"
+            >
+              <Minus size={16} color={colors.text} />
+            </Pressable>
+          </View>
+          <View style={styles.addPair}>
+            <RippleButton
+              label={settings.unit === 'oz' ? '+16' : '+500'}
+              sublabel={unit}
+              onPress={() => handleAdd(settings.unit === 'oz' ? 473 : 500)}
+              color={colors.tint}
+            />
+            <Pressable
+              onPress={() => handleSubtract(settings.unit === 'oz' ? 473 : 500)}
+              style={[styles.minusBtn, { backgroundColor: colors.surfaceSecondary, borderColor: colors.border }]}
+              testID="minus-btn-large"
+            >
+              <Minus size={16} color={colors.text} />
+            </Pressable>
+          </View>
+          <View style={styles.addPair}>
+            <RippleButton
+              label="Custom"
+              onPress={() => setCustomModalVisible(true)}
+              color={isDark ? colors.surfaceSecondary : colors.surfaceSecondary}
+              textColor={colors.text}
+              style={{ borderWidth: 1, borderColor: colors.border }}
+            />
+            <View style={styles.minusSpacer} />
+          </View>
         </View>
 
         <View style={[styles.verseCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -400,8 +430,24 @@ const styles = StyleSheet.create({
   buttonsRow: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "flex-start",
     gap: 12,
     marginBottom: 28,
+  },
+  addPair: {
+    alignItems: "center",
+    gap: 8,
+  },
+  minusBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+  },
+  minusSpacer: {
+    height: 32,
   },
   verseCard: {
     borderRadius: 20,
