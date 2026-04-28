@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "AquaFlow Water Tracker",
-    "slug": "aquaflow-water-tracker",
+    "name": "AquaGrace",
+    "slug": "aquagrace",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "app.rork.aquaflow-water-tracker"
+      "bundleIdentifier": "com.christianappempire.aquagrace"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.aquaflow_water_tracker"
+      "package": "com.christianappempire.aquagrace"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
