@@ -47,6 +47,12 @@ export default function HomeScreen() {
   );
   const soundPlayer = useAudioPlayer(audioSource);
 
+  const goopSource = useMemo(
+    () => ({ uri: "https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3" }),
+    []
+  );
+  const goopPlayer = useAudioPlayer(goopSource);
+
   const playDrinkSound = useCallback(() => {
     if (!drinkSoundUrl) return;
     try {
@@ -56,6 +62,15 @@ export default function HomeScreen() {
       console.log("[AquaGrace] Sound play error", err);
     }
   }, [drinkSoundUrl, soundPlayer]);
+
+  const playGoopSound = useCallback(() => {
+    try {
+      goopPlayer.seekTo(0);
+      goopPlayer.play();
+    } catch (err) {
+      console.log("[AquaGrace] Goop play error", err);
+    }
+  }, [goopPlayer]);
 
   const handleAdd = useCallback(
     (amount: number) => {
@@ -81,8 +96,9 @@ export default function HomeScreen() {
     (amount: number) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
       subtractWater(amount);
+      playGoopSound();
     },
-    [subtractWater]
+    [subtractWater, playGoopSound]
   );
 
   const handleCustomSubmit = useCallback(() => {
