@@ -377,6 +377,21 @@ export default function SettingsScreen() {
           </View>
         </Pressable>
 
+        <View style={styles.creditsContainer}>
+          <Text style={[styles.creditsAppName, { color: colors.text }]}>
+            AquaGrace
+          </Text>
+          <Text style={[styles.creditsLabel, { color: colors.textTertiary }]}>
+            Developed By
+          </Text>
+          <Text style={[styles.creditsCompany, { color: colors.textSecondary }]}>
+            Christian App Empire LLC
+          </Text>
+          <Text style={[styles.creditsCopyright, { color: colors.textTertiary }]}>
+            Copyright © 2026. All Rights Reserved.
+          </Text>
+        </View>
+
         <Text style={[styles.footerText, { color: colors.textTertiary }]}>
           AquaGrace v1.0 · Stay hydrated
         </Text>
@@ -709,5 +724,34 @@ const styles = StyleSheet.create({
     fontWeight: "800" as const,
     color: "#FFF",
     letterSpacing: -0.2,
+  },
+  creditsContainer: {
+    alignItems: "center",
+    marginTop: 16,
+    marginBottom: 8,
+    paddingHorizontal: 20,
+  },
+  creditsAppName: {
+    fontSize: 18,
+    fontWeight: "800" as const,
+    letterSpacing: -0.4,
+    marginBottom: 8,
+  },
+  creditsLabel: {
+    fontSize: 11,
+    fontWeight: "500" as const,
+    letterSpacing: 0.6,
+    textTransform: "uppercase" as const,
+    marginBottom: 4,
+  },
+  creditsCompany: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    marginBottom: 10,
+  },
+  creditsCopyright: {
+    fontSize: 11,
+    fontWeight: "400" as const,
+    textAlign: "center",
   },
 });
