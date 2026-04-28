@@ -10,22 +10,22 @@ export const DRINK_SOUNDS: DrinkSoundOption[] = [
   {
     id: "drop",
     label: "Water Drop",
-    url: "https://actions.google.com/sounds/v1/water/water_droplet.ogg",
+    url: "https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3",
   },
   {
     id: "splash",
     label: "Splash",
-    url: "https://actions.google.com/sounds/v1/water/water_dripping.ogg",
+    url: "https://assets.mixkit.co/active_storage/sfx/2014/2014-preview.mp3",
   },
   {
     id: "pop",
     label: "Pop",
-    url: "https://actions.google.com/sounds/v1/cartoon/pop.ogg",
+    url: "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3",
   },
   {
     id: "chime",
     label: "Chime",
-    url: "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg",
+    url: "https://assets.mixkit.co/active_storage/sfx/1822/1822-preview.mp3",
   },
   {
     id: "none",
