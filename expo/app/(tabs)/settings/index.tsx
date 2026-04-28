@@ -393,7 +393,7 @@ export default function SettingsScreen() {
         </View>
 
         <Text style={[styles.footerText, { color: colors.textTertiary }]}>
-          AquaGrace v1.0 · Stay hydrated
+          Proverbs 4:23
         </Text>
       </ScrollView>
 
