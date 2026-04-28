@@ -1,5 +1,5 @@
 import { useAudioPlayer } from "expo-audio";
-import { Bell, ChevronRight, Clock, Droplets, Moon, Music, Ruler, Sun, Volume2 } from "lucide-react-native";
+import { Bell, ChevronRight, Clock, Droplets, Moon, Music, Ruler, Sparkles, Sun, Volume2 } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
@@ -104,6 +104,15 @@ export default function SettingsScreen() {
       Alert.alert("Invalid", "Please enter time in 12-hour format (e.g., 7:00 AM).");
     }
   }, [timeInput, editingTime, updateSettings]);
+
+  const handleRemoveAds = useCallback(() => {
+    console.log("[AquaGrace] Remove Ads pressed");
+    Alert.alert(
+      "Remove Ads",
+      "Purchases are not available yet. Please check back soon!",
+      [{ text: "OK" }]
+    );
+  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -337,6 +346,36 @@ export default function SettingsScreen() {
             />
           </View>
         </View>
+
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+          UPGRADE
+        </Text>
+        <Pressable
+          onPress={handleRemoveAds}
+          style={({ pressed }) => [
+            styles.removeAdsCard,
+            {
+              backgroundColor: colors.tint,
+              opacity: pressed ? 0.9 : 1,
+            },
+          ]}
+          testID="remove-ads-button"
+        >
+          <View style={styles.removeAdsLeft}>
+            <View style={styles.removeAdsIconBox}>
+              <Sparkles size={20} color="#FFF" />
+            </View>
+            <View>
+              <Text style={styles.removeAdsTitle}>Remove Ads</Text>
+              <Text style={styles.removeAdsSubtitle}>
+                Enjoy AquaGrace ad-free, forever
+              </Text>
+            </View>
+          </View>
+          <View style={styles.removeAdsPriceBox}>
+            <Text style={styles.removeAdsPrice}>$3.99</Text>
+          </View>
+        </Pressable>
 
         <Text style={[styles.footerText, { color: colors.textTertiary }]}>
           AquaGrace v1.0 · Stay hydrated
@@ -619,5 +658,56 @@ const styles = StyleSheet.create({
   modalBtnText: {
     fontSize: 15,
     fontWeight: "600" as const,
+  },
+  removeAdsCard: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  removeAdsLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+  },
+  removeAdsIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255,255,255,0.22)",
+  },
+  removeAdsTitle: {
+    fontSize: 16,
+    fontWeight: "700" as const,
+    color: "#FFF",
+    letterSpacing: -0.2,
+  },
+  removeAdsSubtitle: {
+    fontSize: 12,
+    fontWeight: "500" as const,
+    color: "rgba(255,255,255,0.85)",
+    marginTop: 2,
+  },
+  removeAdsPriceBox: {
+    backgroundColor: "rgba(255,255,255,0.22)",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  removeAdsPrice: {
+    fontSize: 15,
+    fontWeight: "800" as const,
+    color: "#FFF",
+    letterSpacing: -0.2,
   },
 });
