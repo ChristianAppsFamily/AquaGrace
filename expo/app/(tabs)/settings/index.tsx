@@ -1,8 +1,10 @@
-import { ChevronRight, Droplets, Moon, Sun, Clock, Bell, Ruler } from "lucide-react-native";
-import React, { useCallback, useState } from "react";
+import { useAudioPlayer } from "expo-audio";
+import { Bell, ChevronRight, Clock, Droplets, Moon, Music, Ruler, Sun, Volume2 } from "lucide-react-native";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,8 +16,13 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Colors from "@/constants/colors";
+import { DRINK_SOUNDS, getDrinkSoundUrl } from "@/constants/sounds";
 import { useWater } from "@/providers/WaterProvider";
-import { UnitType, formatAmount, unitLabel, to12Hour, from12Hour } from "@/types/water";
+import { DrinkSoundId, UnitType, formatAmount, unitLabel, to12Hour, from12Hour } from "@/types/water";
+
+const webInputReset = Platform.OS === "web"
+  ? ({ outlineStyle: "none", outlineWidth: 0, outlineColor: "transparent" } as unknown as object)
+  : null;
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -56,6 +63,32 @@ export default function SettingsScreen() {
       setTimeModalVisible(true);
     },
     [settings.wakeTime, settings.sleepTime]
+  );
+
+  const previewSoundUrl = useMemo(
+    () => getDrinkSoundUrl(settings.drinkSound),
+    [settings.drinkSound]
+  );
+  const previewSource = useMemo(
+    () => (previewSoundUrl ? { uri: previewSoundUrl } : null),
+    [previewSoundUrl]
+  );
+  const previewPlayer = useAudioPlayer(previewSource);
+
+  const handleSelectSound = useCallback(
+    (id: DrinkSoundId) => {
+      updateSettings({ drinkSound: id });
+      const url = getDrinkSoundUrl(id);
+      if (!url) return;
+      try {
+        previewPlayer.replace({ uri: url });
+        previewPlayer.seekTo(0);
+        previewPlayer.play();
+      } catch (err) {
+        console.log("[AquaGrace] Preview sound error", err);
+      }
+    },
+    [updateSettings, previewPlayer]
   );
 
   const handleSaveTime = useCallback(() => {
@@ -150,6 +183,59 @@ export default function SettingsScreen() {
                 </Text>
               </Pressable>
             ))}
+          </View>
+        </View>
+
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+          DRINK SOUND
+        </Text>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={styles.row}>
+            <View style={styles.rowLeft}>
+              <View style={[styles.iconBox, { backgroundColor: colors.tintLight }]}>
+                <Volume2 size={18} color={colors.tint} />
+              </View>
+              <View>
+                <Text style={[styles.rowTitle, { color: colors.text }]}>
+                  Add Drink Sound
+                </Text>
+                <Text style={[styles.rowValue, { color: colors.textSecondary }]}>
+                  Plays when you log water
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.soundList}>
+            {DRINK_SOUNDS.map((sound) => {
+              const active = settings.drinkSound === sound.id;
+              return (
+                <Pressable
+                  key={sound.id}
+                  onPress={() => handleSelectSound(sound.id)}
+                  style={[
+                    styles.soundChip,
+                    {
+                      backgroundColor: active ? colors.tint : colors.surfaceSecondary,
+                      borderColor: active ? colors.tint : colors.border,
+                    },
+                  ]}
+                  testID={`drink-sound-${sound.id}`}
+                >
+                  <Music
+                    size={14}
+                    color={active ? "#FFF" : colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.soundChipText,
+                      { color: active ? "#FFF" : colors.text },
+                    ]}
+                  >
+                    {sound.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
         </View>
 
@@ -273,7 +359,7 @@ export default function SettingsScreen() {
             </Text>
             <View style={[styles.inputRow, { borderColor: colors.border }]}>
               <TextInput
-                style={[styles.input, { color: colors.text }]}
+                style={[styles.input, { color: colors.text }, webInputReset]}
                 placeholder="2000"
                 placeholderTextColor={colors.textTertiary}
                 keyboardType="number-pad"
@@ -320,7 +406,7 @@ export default function SettingsScreen() {
             </Text>
             <View style={[styles.inputRow, { borderColor: colors.border }]}>
               <TextInput
-                style={[styles.input, { color: colors.text }]}
+                style={[styles.input, { color: colors.text }, webInputReset]}
                 placeholder="7:00 AM"
                 placeholderTextColor={colors.textTertiary}
                 keyboardType="default"
@@ -481,12 +567,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginBottom: 12,
+    overflow: "hidden",
   },
   input: {
     flex: 1,
     fontSize: 28,
     fontWeight: "700" as const,
     letterSpacing: -0.5,
+    minWidth: 0,
+  },
+  soundList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  soundChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  soundChipText: {
+    fontSize: 13,
+    fontWeight: "600" as const,
   },
   inputUnit: {
     fontSize: 16,

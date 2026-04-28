@@ -1,9 +1,11 @@
+import { useAudioPlayer } from "expo-audio";
 import { router } from "expo-router";
 import { BookOpen, Droplets, Flame, Music } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -16,8 +18,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CircularProgress from "@/components/CircularProgress";
 import RippleButton from "@/components/RippleButton";
 import Colors from "@/constants/colors";
+import { getDrinkSoundUrl } from "@/constants/sounds";
 import { getDailyVerse } from "@/constants/verses";
 import { useTodayProgress, useWater } from "@/providers/WaterProvider";
+
+const webInputReset = Platform.OS === "web"
+  ? ({ outlineStyle: "none", outlineWidth: 0, outlineColor: "transparent" } as unknown as object)
+  : null;
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -32,9 +39,27 @@ export default function HomeScreen() {
 
   const splashAnim = useRef(new Animated.Value(0)).current;
 
+  const drinkSoundUrl = getDrinkSoundUrl(settings.drinkSound);
+  const audioSource = useMemo(
+    () => (drinkSoundUrl ? { uri: drinkSoundUrl } : null),
+    [drinkSoundUrl]
+  );
+  const soundPlayer = useAudioPlayer(audioSource);
+
+  const playDrinkSound = useCallback(() => {
+    if (!drinkSoundUrl) return;
+    try {
+      soundPlayer.seekTo(0);
+      soundPlayer.play();
+    } catch (err) {
+      console.log("[AquaGrace] Sound play error", err);
+    }
+  }, [drinkSoundUrl, soundPlayer]);
+
   const handleAdd = useCallback(
     (amount: number) => {
       addWater(amount);
+      playDrinkSound();
       Animated.sequence([
         Animated.timing(splashAnim, {
           toValue: 1,
@@ -48,7 +73,7 @@ export default function HomeScreen() {
         }),
       ]).start();
     },
-    [addWater, splashAnim]
+    [addWater, splashAnim, playDrinkSound]
   );
 
   const handleCustomSubmit = useCallback(() => {
@@ -237,7 +262,7 @@ export default function HomeScreen() {
             </Text>
             <View style={[styles.inputRow, { borderColor: colors.border }]}>
               <TextInput
-                style={[styles.input, { color: colors.text }]}
+                style={[styles.input, { color: colors.text }, webInputReset]}
                 placeholder="0"
                 placeholderTextColor={colors.textTertiary}
                 keyboardType="number-pad"
@@ -466,12 +491,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginBottom: 20,
+    overflow: "hidden",
   },
   input: {
     flex: 1,
     fontSize: 28,
     fontWeight: "700" as const,
     letterSpacing: -0.5,
+    minWidth: 0,
   },
   inputUnit: {
     fontSize: 16,

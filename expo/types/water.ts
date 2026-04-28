@@ -13,6 +13,8 @@ export interface DailyRecord {
 
 export type UnitType = 'ml' | 'oz';
 
+export type DrinkSoundId = 'drop' | 'splash' | 'pop' | 'chime' | 'none';
+
 export interface UserSettings {
   goalMl: number;
   wakeTime: string;
@@ -20,6 +22,7 @@ export interface UserSettings {
   darkMode: boolean;
   reminders: string[];
   unit: UnitType;
+  drinkSound: DrinkSoundId;
 }
 
 export interface WaterState {
@@ -37,6 +40,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
     "14:00", "15:30", "17:00", "19:00",
   ],
   unit: 'oz',
+  drinkSound: 'drop',
 };
 
 const ML_PER_OZ = 29.5735;
