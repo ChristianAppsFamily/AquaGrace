@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
     "08:00", "09:30", "11:00", "12:30",
     "14:00", "15:30", "17:00", "19:00",
   ],
-  unit: 'ml',
+  unit: 'oz',
 };
 
 const ML_PER_OZ = 29.5735;
