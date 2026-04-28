@@ -47,17 +47,6 @@ export default function HomeScreen() {
   );
   const soundPlayer = useAudioPlayer(audioSource);
 
-  const splashSource = useMemo(
-    () => ({ uri: "https://assets.mixkit.co/active_storage/sfx/2014/2014-preview.mp3" }),
-    []
-  );
-  const goopSource = useMemo(
-    () => ({ uri: "https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3" }),
-    []
-  );
-  const splashPlayer = useAudioPlayer(splashSource);
-  const goopPlayer = useAudioPlayer(goopSource);
-
   const playDrinkSound = useCallback(() => {
     if (!drinkSoundUrl) return;
     try {
@@ -68,28 +57,9 @@ export default function HomeScreen() {
     }
   }, [drinkSoundUrl, soundPlayer]);
 
-  const playSplashSound = useCallback(() => {
-    try {
-      splashPlayer.seekTo(0);
-      splashPlayer.play();
-    } catch (err) {
-      console.log("[AquaGrace] Splash play error", err);
-    }
-  }, [splashPlayer]);
-
-  const playGoopSound = useCallback(() => {
-    try {
-      goopPlayer.seekTo(0);
-      goopPlayer.play();
-    } catch (err) {
-      console.log("[AquaGrace] Goop play error", err);
-    }
-  }, [goopPlayer]);
-
   const handleAdd = useCallback(
     (amount: number) => {
       addWater(amount);
-      playSplashSound();
       playDrinkSound();
       Animated.sequence([
         Animated.timing(splashAnim, {
@@ -104,16 +74,15 @@ export default function HomeScreen() {
         }),
       ]).start();
     },
-    [addWater, splashAnim, playDrinkSound, playSplashSound]
+    [addWater, splashAnim, playDrinkSound]
   );
 
   const handleSubtract = useCallback(
     (amount: number) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
       subtractWater(amount);
-      playGoopSound();
     },
-    [subtractWater, playGoopSound]
+    [subtractWater]
   );
 
   const handleCustomSubmit = useCallback(() => {
