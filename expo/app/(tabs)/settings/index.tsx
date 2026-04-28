@@ -1,5 +1,5 @@
 import { useAudioPlayer } from "expo-audio";
-import { Bell, ChevronRight, Clock, Droplets, Moon, Music, Ruler, Sparkles, Sun, Volume2 } from "lucide-react-native";
+import { Bell, ChevronRight, Clock, Droplets, Moon, Music, Plus, Ruler, Sparkles, Sun, Volume2, X } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
@@ -35,6 +35,9 @@ export default function SettingsScreen() {
   const [timeModalVisible, setTimeModalVisible] = useState<boolean>(false);
   const [editingTime, setEditingTime] = useState<"wake" | "sleep">("wake");
   const [timeInput, setTimeInput] = useState<string>("");
+  const [reminderModalVisible, setReminderModalVisible] = useState<boolean>(false);
+  const [reminderInput, setReminderInput] = useState<string>("");
+  const [editingReminderIndex, setEditingReminderIndex] = useState<number | null>(null);
 
   const handleSaveGoal = useCallback(() => {
     const val = parseInt(goalInput, 10);
@@ -104,6 +107,64 @@ export default function SettingsScreen() {
       Alert.alert("Invalid", "Please enter time in 12-hour format (e.g., 7:00 AM).");
     }
   }, [timeInput, editingTime, updateSettings]);
+
+  const handleOpenReminder = useCallback(
+    (index: number | null) => {
+      if (index === null) {
+        setReminderInput("");
+      } else {
+        setReminderInput(to12Hour(settings.reminders[index]));
+      }
+      setEditingReminderIndex(index);
+      setReminderModalVisible(true);
+    },
+    [settings.reminders]
+  );
+
+  const handleSaveReminder = useCallback(() => {
+    const formatted = from12Hour(reminderInput);
+    if (!formatted) {
+      Alert.alert("Invalid", "Please enter time in 12-hour format (e.g., 7:00 AM).");
+      return;
+    }
+    const current = settings.reminders;
+    let next: string[];
+    if (editingReminderIndex === null) {
+      if (current.includes(formatted)) {
+        Alert.alert("Duplicate", "This reminder time already exists.");
+        return;
+      }
+      next = [...current, formatted];
+    } else {
+      next = current.map((t, i) => (i === editingReminderIndex ? formatted : t));
+      const seen = new Set<string>();
+      for (const t of next) {
+        if (seen.has(t)) {
+          Alert.alert("Duplicate", "This reminder time already exists.");
+          return;
+        }
+        seen.add(t);
+      }
+    }
+    next.sort();
+    updateSettings({ reminders: next });
+    setReminderModalVisible(false);
+  }, [reminderInput, editingReminderIndex, settings.reminders, updateSettings]);
+
+  const handleDeleteReminder = useCallback(() => {
+    if (editingReminderIndex === null) return;
+    const next = settings.reminders.filter((_, i) => i !== editingReminderIndex);
+    updateSettings({ reminders: next });
+    setReminderModalVisible(false);
+  }, [editingReminderIndex, settings.reminders, updateSettings]);
+
+  const handleRemoveChip = useCallback(
+    (index: number) => {
+      const next = settings.reminders.filter((_, i) => i !== index);
+      updateSettings({ reminders: next });
+    },
+    [settings.reminders, updateSettings]
+  );
 
   const handleRemoveAds = useCallback(() => {
     console.log("[AquaGrace] Remove Ads pressed");
@@ -307,20 +368,42 @@ export default function SettingsScreen() {
             </View>
           </View>
           <View style={styles.reminderChips}>
-            {settings.reminders.map((time) => (
-              <View
-                key={time}
+            {settings.reminders.map((time, index) => (
+              <Pressable
+                key={`${time}-${index}`}
+                onPress={() => handleOpenReminder(index)}
                 style={[
                   styles.chip,
                   { backgroundColor: colors.surfaceSecondary, borderColor: colors.border },
                 ]}
+                testID={`reminder-chip-${index}`}
               >
                 <Clock size={12} color={colors.textSecondary} />
                 <Text style={[styles.chipText, { color: colors.text }]}>
                   {to12Hour(time)}
                 </Text>
-              </View>
+                <Pressable
+                  onPress={() => handleRemoveChip(index)}
+                  hitSlop={8}
+                  style={styles.chipRemove}
+                  testID={`reminder-remove-${index}`}
+                >
+                  <X size={12} color={colors.textTertiary} />
+                </Pressable>
+              </Pressable>
             ))}
+            <Pressable
+              onPress={() => handleOpenReminder(null)}
+              style={[
+                styles.chip,
+                styles.chipAdd,
+                { backgroundColor: colors.tintLight, borderColor: colors.tint },
+              ]}
+              testID="reminder-add"
+            >
+              <Plus size={12} color={colors.tint} />
+              <Text style={[styles.chipText, { color: colors.tint }]}>Add</Text>
+            </Pressable>
           </View>
         </View>
 
@@ -436,6 +519,63 @@ export default function SettingsScreen() {
               <Pressable
                 onPress={handleSaveGoal}
                 style={[styles.modalBtn, { backgroundColor: colors.tint }]}
+              >
+                <Text style={[styles.modalBtnText, { color: "#FFF" }]}>Save</Text>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      <Modal
+        visible={reminderModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setReminderModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setReminderModalVisible(false)}
+        >
+          <Pressable style={[styles.modalCard, { backgroundColor: colors.surface }]} onPress={() => {}}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              {editingReminderIndex === null ? "Add Reminder" : "Edit Reminder"}
+            </Text>
+            <View style={[styles.inputRow, { borderColor: colors.border }]}>
+              <TextInput
+                style={[styles.input, { color: colors.text }, webInputReset]}
+                placeholder="7:00 AM"
+                placeholderTextColor={colors.textTertiary}
+                keyboardType="default"
+                value={reminderInput}
+                onChangeText={setReminderInput}
+                autoFocus
+                testID="reminder-input"
+              />
+            </View>
+            <Text style={[styles.inputHint, { color: colors.textTertiary }]}>
+              Use 12h format (e.g., 7:00 AM or 11:00 PM)
+            </Text>
+            {editingReminderIndex !== null && (
+              <Pressable
+                onPress={handleDeleteReminder}
+                style={[styles.modalBtn, styles.deleteBtn, { backgroundColor: colors.surfaceSecondary, marginBottom: 12 }]}
+                testID="reminder-delete"
+              >
+                <Text style={[styles.modalBtnText, { color: "#E53935" }]}>Delete</Text>
+              </Pressable>
+            )}
+            <View style={styles.modalButtons}>
+              <Pressable
+                onPress={() => setReminderModalVisible(false)}
+                style={[styles.modalBtn, { backgroundColor: colors.surfaceSecondary }]}
+              >
+                <Text style={[styles.modalBtnText, { color: colors.text }]}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                onPress={handleSaveReminder}
+                style={[styles.modalBtn, { backgroundColor: colors.tint }]}
+                testID="reminder-save"
               >
                 <Text style={[styles.modalBtnText, { color: "#FFF" }]}>Save</Text>
               </Pressable>
@@ -566,6 +706,18 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
+  },
+  chipRemove: {
+    marginLeft: 2,
+    padding: 2,
+  },
+  chipAdd: {
+    borderStyle: "dashed" as const,
+  },
+  deleteBtn: {
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
   },
   chipText: {
     fontSize: 13,
