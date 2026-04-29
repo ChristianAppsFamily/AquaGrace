@@ -1,5 +1,6 @@
 import { useAudioPlayer } from "expo-audio";
-import { Bell, ChevronRight, Clock, Droplets, Moon, Music, Plus, Ruler, Sparkles, Sun, Volume2, X } from "lucide-react-native";
+import { router } from "expo-router";
+import { Bell, ChevronRight, Clock, Droplets, Moon, Music, Plus, Ruler, Shield, Sparkles, Sun, Volume2, X } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
@@ -438,6 +439,32 @@ export default function SettingsScreen() {
               testID="dark-mode-switch"
             />
           </View>
+        </View>
+
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+          LEGAL
+        </Text>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Pressable
+            style={styles.row}
+            onPress={() => router.push("/privacy-policy")}
+            testID="privacy-policy-link"
+          >
+            <View style={styles.rowLeft}>
+              <View style={[styles.iconBox, { backgroundColor: colors.tintLight }]}>
+                <Shield size={18} color={colors.tint} />
+              </View>
+              <View>
+                <Text style={[styles.rowTitle, { color: colors.text }]}>
+                  Privacy Policy
+                </Text>
+                <Text style={[styles.rowValue, { color: colors.textSecondary }]}>
+                  Data, ads, tracking, and purchases
+                </Text>
+              </View>
+            </View>
+            <ChevronRight size={18} color={colors.textTertiary} />
+          </Pressable>
         </View>
 
         <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
