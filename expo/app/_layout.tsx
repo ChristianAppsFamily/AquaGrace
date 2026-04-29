@@ -22,6 +22,13 @@ function RootLayoutNav() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="privacy-policy"
+        options={{
+          title: "Privacy Policy",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

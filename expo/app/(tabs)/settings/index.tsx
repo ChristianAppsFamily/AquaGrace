@@ -1,5 +1,6 @@
 import { useAudioPlayer } from "expo-audio";
-import { Bell, ChevronRight, Clock, Droplets, Moon, Music, Plus, Ruler, Sparkles, Sun, Volume2, X } from "lucide-react-native";
+import { router } from "expo-router";
+import { Bell, ChevronRight, Clock, Droplets, Moon, Music, Plus, Ruler, Shield, Sparkles, Sun, Volume2, X } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
@@ -17,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Colors from "@/constants/colors";
 import { DRINK_SOUNDS, getDrinkSoundUrl } from "@/constants/sounds";
+import { useRemoveAdsPurchase } from "@/hooks/useRemoveAdsPurchase";
 import { useWater } from "@/providers/WaterProvider";
 import { DrinkSoundId, UnitType, formatAmount, unitLabel, to12Hour, from12Hour } from "@/types/water";
 
@@ -29,6 +31,14 @@ export default function SettingsScreen() {
   const { settings, updateSettings } = useWater();
   const isDark = settings.darkMode;
   const colors = isDark ? Colors.dark : Colors.light;
+  const {
+    connected: storeConnected,
+    hasRemovedAds,
+    isBusy: purchaseBusy,
+    price: removeAdsPrice,
+    purchase: purchaseRemoveAds,
+    restore: restoreRemoveAds,
+  } = useRemoveAdsPurchase();
 
   const [goalModalVisible, setGoalModalVisible] = useState<boolean>(false);
   const [goalInput, setGoalInput] = useState<string>(String(settings.goalMl));
@@ -167,13 +177,14 @@ export default function SettingsScreen() {
   );
 
   const handleRemoveAds = useCallback(() => {
-    console.log("[AquaGrace] Remove Ads pressed");
-    Alert.alert(
-      "Remove Ads",
-      "Purchases are not available yet. Please check back soon!",
-      [{ text: "OK" }]
-    );
-  }, []);
+    purchaseRemoveAds();
+  }, [purchaseRemoveAds]);
+
+  const removeAdsSubtitle = hasRemovedAds
+    ? "AquaGrace is ad-free on this device"
+    : storeConnected
+      ? "Enjoy AquaGrace ad-free, forever"
+      : "Connect to the App Store or Play Store";
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -431,15 +442,42 @@ export default function SettingsScreen() {
         </View>
 
         <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+          LEGAL
+        </Text>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Pressable
+            style={styles.row}
+            onPress={() => router.push("/privacy-policy")}
+            testID="privacy-policy-link"
+          >
+            <View style={styles.rowLeft}>
+              <View style={[styles.iconBox, { backgroundColor: colors.tintLight }]}>
+                <Shield size={18} color={colors.tint} />
+              </View>
+              <View>
+                <Text style={[styles.rowTitle, { color: colors.text }]}>
+                  Privacy Policy
+                </Text>
+                <Text style={[styles.rowValue, { color: colors.textSecondary }]}>
+                  Data, ads, tracking, and purchases
+                </Text>
+              </View>
+            </View>
+            <ChevronRight size={18} color={colors.textTertiary} />
+          </Pressable>
+        </View>
+
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
           UPGRADE
         </Text>
         <Pressable
           onPress={handleRemoveAds}
+          disabled={purchaseBusy || hasRemovedAds}
           style={({ pressed }) => [
             styles.removeAdsCard,
             {
-              backgroundColor: colors.tint,
-              opacity: pressed ? 0.9 : 1,
+              backgroundColor: hasRemovedAds ? colors.success : colors.tint,
+              opacity: pressed && !purchaseBusy && !hasRemovedAds ? 0.9 : 1,
             },
           ]}
           testID="remove-ads-button"
@@ -449,16 +487,40 @@ export default function SettingsScreen() {
               <Sparkles size={20} color="#FFF" />
             </View>
             <View>
-              <Text style={styles.removeAdsTitle}>Remove Ads</Text>
+              <Text style={styles.removeAdsTitle}>
+                {hasRemovedAds ? "Ads Removed" : "Remove Ads"}
+              </Text>
               <Text style={styles.removeAdsSubtitle}>
-                Enjoy AquaGrace ad-free, forever
+                {removeAdsSubtitle}
               </Text>
             </View>
           </View>
           <View style={styles.removeAdsPriceBox}>
-            <Text style={styles.removeAdsPrice}>$3.99</Text>
+            <Text style={styles.removeAdsPrice}>
+              {hasRemovedAds ? "Owned" : purchaseBusy ? "..." : removeAdsPrice}
+            </Text>
           </View>
         </Pressable>
+
+        {!hasRemovedAds && (
+          <Pressable
+            onPress={restoreRemoveAds}
+            disabled={purchaseBusy}
+            style={({ pressed }) => [
+              styles.restoreAdsButton,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                opacity: pressed && !purchaseBusy ? 0.85 : 1,
+              },
+            ]}
+            testID="restore-purchases-button"
+          >
+            <Text style={[styles.restoreAdsText, { color: colors.tint }]}>
+              Restore Purchases
+            </Text>
+          </Pressable>
+        )}
 
         <View style={styles.creditsContainer}>
           <Text style={[styles.creditsAppName, { color: colors.text }]}>
@@ -839,6 +901,9 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
+  removeAdsCardDisabled: {
+    opacity: 0.65,
+  },
   removeAdsLeft: {
     flexDirection: "row",
     alignItems: "center",
@@ -876,6 +941,17 @@ const styles = StyleSheet.create({
     fontWeight: "800" as const,
     color: "#FFF",
     letterSpacing: -0.2,
+  },
+  restoreAdsButton: {
+    alignItems: "center",
+    borderRadius: 14,
+    borderWidth: 1,
+    marginBottom: 24,
+    paddingVertical: 12,
+  },
+  restoreAdsText: {
+    fontSize: 14,
+    fontWeight: "700" as const,
   },
   creditsContainer: {
     alignItems: "center",

@@ -21,6 +21,7 @@ import RippleButton from "@/components/RippleButton";
 import Colors from "@/constants/colors";
 import { getDrinkSoundUrl } from "@/constants/sounds";
 import { getDailyVerse } from "@/constants/verses";
+import { useInterstitialAds } from "@/hooks/useInterstitialAds";
 import { useTodayProgress, useWater } from "@/providers/WaterProvider";
 
 const webInputReset = Platform.OS === "web"
@@ -29,8 +30,9 @@ const webInputReset = Platform.OS === "web"
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { addWater, subtractWater, todayRecord, settings, streak, formatAmount: fmt, unitLabel: getUnit } = useWater();
+  const { addWater, subtractWater, todayRecord, settings, streak, formatAmount: fmt, unitLabel: getUnit, hasRemovedAds } = useWater();
   const { progress, remaining, total, goal } = useTodayProgress();
+  const showInterstitial = useInterstitialAds({ adsRemoved: hasRemovedAds });
   const unit = getUnit();
   const [customModalVisible, setCustomModalVisible] = useState<boolean>(false);
   const [customAmount, setCustomAmount] = useState<string>("");
@@ -73,8 +75,9 @@ export default function HomeScreen() {
   }, [goopPlayer]);
 
   const handleAdd = useCallback(
-    (amount: number) => {
+    async (amount: number) => {
       addWater(amount);
+      await showInterstitial();
       playDrinkSound();
       Animated.sequence([
         Animated.timing(splashAnim, {
@@ -89,7 +92,7 @@ export default function HomeScreen() {
         }),
       ]).start();
     },
-    [addWater, splashAnim, playDrinkSound]
+    [addWater, showInterstitial, splashAnim, playDrinkSound]
   );
 
   const handleSubtract = useCallback(
