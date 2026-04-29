@@ -40,9 +40,16 @@
           "origin": "https://rork.com/"
         }
       ],
+      "./plugins/with-ios-privacy-cleanup",
       "expo-font",
       "expo-web-browser",
-      "expo-audio",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
       [
         "expo-tracking-transparency",
         {
