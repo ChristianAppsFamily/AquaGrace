@@ -1,0 +1,36 @@
+{
+  "identifier": "AquaGraceStoreKitConfiguration",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "aquagrace-remove-ads",
+      "localizations": [
+        {
+          "description": "Remove banner and interstitial ads from AquaGrace.",
+          "displayName": "Remove Ads",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.christianappempire.aquagrace.remove_ads",
+      "referenceName": "AquaGrace Remove Ads",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "aquagrace-ios",
+    "_askToBuyEnabled": false,
+    "_billingGracePeriodEnabled": false,
+    "_failTransactionsEnabled": false,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": [],
+    "_timeRate": 1
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}
