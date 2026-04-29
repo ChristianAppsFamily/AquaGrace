@@ -16,11 +16,13 @@ import {
 
 const SETTINGS_KEY = "aquaflow_settings";
 const RECORDS_KEY = "aquaflow_records";
+const ADS_REMOVED_KEY = "aquagrace_ads_removed";
 
 export const [WaterProvider, useWater] = createContextHook(() => {
   const queryClient = useQueryClient();
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const [records, setRecords] = useState<Record<string, DailyRecord>>({});
+  const [hasRemovedAds, setHasRemovedAdsState] = useState<boolean>(false);
 
   const settingsQuery = useQuery({
     queryKey: ["settings"],
@@ -40,6 +42,14 @@ export const [WaterProvider, useWater] = createContextHook(() => {
     },
   });
 
+  const adsRemovedQuery = useQuery({
+    queryKey: ["adsRemoved"],
+    queryFn: async () => {
+      const stored = await AsyncStorage.getItem(ADS_REMOVED_KEY);
+      return stored === "true";
+    },
+  });
+
   useEffect(() => {
     if (settingsQuery.data) {
       setSettings(settingsQuery.data);
@@ -51,6 +61,12 @@ export const [WaterProvider, useWater] = createContextHook(() => {
       setRecords(recordsQuery.data);
     }
   }, [recordsQuery.data]);
+
+  useEffect(() => {
+    if (typeof adsRemovedQuery.data === "boolean") {
+      setHasRemovedAdsState(adsRemovedQuery.data);
+    }
+  }, [adsRemovedQuery.data]);
 
   const { mutate: saveSettings } = useMutation({
     mutationFn: async (newSettings: UserSettings) => {
@@ -69,6 +85,16 @@ export const [WaterProvider, useWater] = createContextHook(() => {
     },
   });
 
+  const { mutate: saveAdsRemoved } = useMutation({
+    mutationFn: async (removed: boolean) => {
+      await AsyncStorage.setItem(ADS_REMOVED_KEY, removed ? "true" : "false");
+      return removed;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adsRemoved"] });
+    },
+  });
+
   const updateSettings = useCallback(
     (partial: Partial<UserSettings>) => {
       const updated = { ...settings, ...partial };
@@ -76,6 +102,14 @@ export const [WaterProvider, useWater] = createContextHook(() => {
       saveSettings(updated);
     },
     [settings, saveSettings]
+  );
+
+  const setHasRemovedAds = useCallback(
+    (removed: boolean) => {
+      setHasRemovedAdsState(removed);
+      saveAdsRemoved(removed);
+    },
+    [saveAdsRemoved]
   );
 
   const todayKey = getTodayKey();
@@ -232,7 +266,8 @@ export const [WaterProvider, useWater] = createContextHook(() => {
     return count;
   }, [records]);
 
-  const isLoading = settingsQuery.isLoading || recordsQuery.isLoading;
+  const isLoading =
+    settingsQuery.isLoading || recordsQuery.isLoading || adsRemovedQuery.isLoading;
 
   return {
     settings,
@@ -244,6 +279,8 @@ export const [WaterProvider, useWater] = createContextHook(() => {
     getRecord,
     getLast7Days,
     records,
+    hasRemovedAds,
+    setHasRemovedAds,
     isLoading,
     streak,
     formatAmount: (ml: number) => formatAmount(ml, settings.unit),

@@ -15,14 +15,20 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.christianappempire.aquagrace"
+      "bundleIdentifier": "com.christianappempire.aquagrace",
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "AquaGrace uses your device advertising identifier to deliver relevant ads and measure ad performance as described in the privacy policy."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.christianappempire.aquagrace"
+      "package": "com.christianappempire.aquagrace",
+      "permissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -36,7 +42,28 @@
       ],
       "expo-font",
       "expo-web-browser",
-      "expo-audio"
+      "expo-audio",
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "AquaGrace uses your device advertising identifier to deliver relevant ads and measure ad performance as described in the privacy policy."
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "delayAppMeasurementInit": true,
+          "optimizeInitialization": true,
+          "optimizeAdLoading": true,
+          "skAdNetworkItems": [
+            "cstr6suwn9.skadnetwork"
+          ],
+          "userTrackingUsageDescription": "AquaGrace uses your device advertising identifier to deliver relevant ads and measure ad performance as described in the privacy policy."
+        }
+      ],
+      "react-native-iap"
     ],
     "experiments": {
       "typedRoutes": true
