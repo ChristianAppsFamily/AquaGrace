@@ -1,0 +1,79 @@
+{
+  "expo": {
+    "name": "AquaGrace",
+    "slug": "aquagrace",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "rork-app",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.christianappempire.aquagrace",
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "AquaGrace uses your device advertising identifier to deliver relevant ads and measure ad performance as described in the privacy policy."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.christianappempire.aquagrace",
+      "permissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://rork.com/"
+        }
+      ],
+      "./plugins/with-ios-privacy-cleanup",
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "AquaGrace uses your device advertising identifier to deliver relevant ads and measure ad performance as described in the privacy policy."
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "delayAppMeasurementInit": true,
+          "optimizeInitialization": true,
+          "optimizeAdLoading": true,
+          "skAdNetworkItems": [
+            "cstr6suwn9.skadnetwork"
+          ],
+          "userTrackingUsageDescription": "AquaGrace uses your device advertising identifier to deliver relevant ads and measure ad performance as described in the privacy policy."
+        }
+      ],
+      "react-native-iap"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
